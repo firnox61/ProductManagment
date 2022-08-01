@@ -1,0 +1,75 @@
+﻿@page "/productpage"
+@page "/productpage/{UrunId:int}"
+@inject IProductService ProductService
+@{
+    var SearchTool = new List<string>() { "Search" };
+}
+@if (UrunId == null)
+{
+    <h3>Create a new product</h3>
+}
+else
+{
+    <h3>Edit "@product.UrunAdi"</h3>
+}
+
+<EditForm Model="product" OnSubmit="HandleSubmit"Toolbar="@SearchTool">
+    <div>
+        <label for="name">UrunAdi</label>
+        <InputText id="name" @bind-Value="product.UrunAdi" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="renk">Renk</label>
+        <InputText id="renk" @bind-Value="product.Renk" class="form-control"></InputText>
+    </div>
+     <div>
+        <label for="fiyat">Fiyat</label>
+        <InputNumber id="fiyat" @bind-Value="product.Fiyat" class="form-control"></InputNumber>
+    </div>
+    
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    @if (UrunId != null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteProduct">Delete Product</button>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? UrunId { get; set; }
+
+    string btnText = string.Empty;
+
+    Product product = new Product();
+
+    protected override void OnInitialized()
+    {
+        btnText = UrunId == null ? "Save New Product" : "Update Product";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (UrunId != null)
+        {
+            product = await ProductService.GetSingleProduct((int)UrunId);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (UrunId == null)
+        {
+            await ProductService.CreateProduct(product);
+        }
+        else
+        {
+            await ProductService.UpdateProduct(product, (int)UrunId);
+        }
+    }
+
+    async Task DeleteProduct()
+    {
+        await ProductService.DeleteProduct(product.UrunId);
+    }
+}

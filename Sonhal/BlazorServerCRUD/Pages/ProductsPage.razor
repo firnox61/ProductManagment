@@ -1,0 +1,53 @@
+﻿@page "/productspage"
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+
+<h3>Products</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>UrunAdi</th>
+            <th>Renk</th>
+            <th>Fiyat</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in ProductService.Products)
+        {
+            <tr>
+                <td>@product.UrunAdi</td>
+                <td>@product.Renk</td>
+                <td>@product.Fiyat</td>
+               
+                <td>
+                    <button class="btn btn-primary"
+                        @onclick="(() => ShowProduct(product.UrunId))">
+                        <i class="oi oi-pencil"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewProduct">Yeni ürün oluştur</button>
+
+@code {
+   
+    protected override async Task OnInitializedAsync()
+    {
+        await ProductService.LoadProducts();
+    }
+
+    void ShowProduct(int UrunId)
+    {
+        NavigationManager.NavigateTo($"productpage/{UrunId}");
+    }
+
+    void CreateNewProduct()
+    {
+        NavigationManager.NavigateTo("productpage");
+    }
+}
